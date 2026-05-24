@@ -1,8 +1,8 @@
 💀 REALITY SUCKS TUNER CHIP 💀
 Advanced QB-Core Vehicle Performance System
-Unlock the underground world of performance tuning with the Reality Sucks Tuner Chip — a sleek, lightweight QB-Core script designed for serious RP servers that want that black market mechanic / street racing energy.
+Unlock the underground world of performance tuning with the Reality Sucks Tuner Chip — a sleek, lightweight QB-Core script designed for serious RP servers that want that black market mechanic / street racing feel.
 
-This isn’t just a performance tweak… it’s a system built for immersion, progression, and chaos.
+This isn't just a performance tweak… it's a system built for immersion, progression, and chaos.
 
 🎥 PREVIEW VIDEO
 👉 [Preview](https://youtu.be/Ejhkf7q--YQ?si=JMF3o5zZ3zBXUwng) 
@@ -17,7 +17,7 @@ This isn’t just a performance tweak… it’s a system built for immersion, pr
 • Seamless integration into existing economy systems
 
 🧠 BUILT FOR REAL RP SERVERS
-Designed for servers that want more than basic “press button = faster car.”
+Designed for servers that want more than basic "press button = faster car."
 
 This system creates:
 
@@ -44,3 +44,9 @@ Restart & enjoy
 
 💬 SUPPORT
 Drop a ⭐ on GitHub if you enjoy the resource and want more free releases from Reality Sucks RP.
+
+---
+
+## Support This Project
+
+<a href='https://ko-fi.com/R6R51XYJ6N' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
