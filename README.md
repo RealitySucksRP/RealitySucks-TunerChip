@@ -2,6 +2,8 @@
 Advanced QB-Core Vehicle Performance System
 Unlock the underground world of performance tuning with the Reality Sucks Tuner Chip — a sleek, lightweight QB-Core script designed for serious RP servers that want that black market mechanic / street racing feel.
 
+CHECK OUT MY TEBEX STORE: https://reality-sucks-rp-webstore.tebex.io/
+
 This isn't just a performance tweak… it's a system built for immersion, progression, and chaos.
 
 🎥 PREVIEW VIDEO
