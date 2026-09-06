@@ -17,7 +17,7 @@ This isn't just a performance tweak. It's a system built for immersion, progress
 
 ## 🎥 Preview Video
 
-👉 [Watch the preview](https://youtu.be/Ejhkf7q--YQ?si=JMF3o5zZ3zBXUwng)
+👉 [Watch the new TunerChip preview](https://youtu.be/2VgFQiGvuLA?si=graywtZHip3W1FK7)
 
 ## ⚙️ Features
 
