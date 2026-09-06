@@ -1,6 +1,7 @@
 # RealitySucks TunerChip
 
 ### RS Drift Lab — vehicle-bound drift control for FiveM
+![Uploading image.png…]()
 
 <p align="center">
   <a href="https://reality-sucks-rp-webstore.tebex.io/package/7391814"><img src="https://img.shields.io/badge/GET%20IT%20FREE-TEBEX-ff6a00?style=for-the-badge" alt="Get RealitySucks TunerChip on Tebex"></a>
