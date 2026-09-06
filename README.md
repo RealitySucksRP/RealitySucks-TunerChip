@@ -1,54 +1,55 @@
-💀 REALITY SUCKS TUNER CHIP 💀
-Advanced QB-Core Vehicle Performance System
-Unlock the underground world of performance tuning with the Reality Sucks Tuner Chip — a sleek, lightweight QB-Core script designed for serious RP servers that want that black market mechanic / street racing feel.
+<p align="center">
+  <a href="https://reality-sucks-rp-webstore.tebex.io/package/7391814"><img src="https://img.shields.io/badge/GET%20IT%20FREE-TEBEX-ff6a00?style=for-the-badge" alt="Get Reality Sucks Tuner Chip on Tebex"></a>
+  <a href="https://reality-sucks-rp-webstore.tebex.io/category/3294407"><img src="https://img.shields.io/badge/EXPLORE-VEHICLES%20AND%20RACING-111111?style=for-the-badge" alt="Explore RealitySucksRP vehicle and racing scripts"></a>
+  <a href="https://discord.gg/e9V3rPHySx"><img src="https://img.shields.io/badge/JOIN-DISCORD-5865F2?style=for-the-badge" alt="Join RealitySucksRP Discord"></a>
+</p>
 
-CHECK OUT MY TEBEX STORE: https://reality-sucks-rp-webstore.tebex.io/
+> I build my own FiveM vehicle systems, racing, garages, dealerships, LS Customs, shops, phones, zombie systems, warfare, Phantom encounters and complete server setups. My scripts are tested in my own server builds and can be configured around the server owner's setup.
 
-This isn't just a performance tweak… it's a system built for immersion, progression, and chaos.
+# 💀 REALITY SUCKS TUNER CHIP 💀
 
-🎥 PREVIEW VIDEO
-👉 [Preview](https://youtu.be/Ejhkf7q--YQ?si=JMF3o5zZ3zBXUwng) 
+### Advanced Vehicle Performance System
 
-⚙️ FEATURES
-• Item-based Tuner Chip system (plug & play)
-• Boost vehicle performance through clean tuning logic
-• Perfect for illegal mechanics / tuner shops / street RP
-• Fully QB-Core compatible
-• Optimized client & server performance (lightweight design)
-• Easy config for items, permissions & balance control
-• Seamless integration into existing economy systems
+Unlock the underground world of performance tuning with the Reality Sucks Tuner Chip — a lightweight performance system built for street racing, tuner shops, underground mechanics and custom RP servers.
 
-🧠 BUILT FOR REAL RP SERVERS
+This isn't just a performance tweak. It's a system built for immersion, progression and chaos.
+
+## 🎥 Preview Video
+
+👉 [Watch the preview](https://youtu.be/Ejhkf7q--YQ?si=JMF3o5zZ3zBXUwng)
+
+## ⚙️ Features
+
+- Item-based Tuner Chip system
+- Vehicle performance tuning
+- Street racing and underground mechanic RP
+- Easy configuration
+- Economy integration
+- Works with additional frameworks through `rs_bridge` where supported
+
+## 🧠 Built For Real RP Servers
+
 Designed for servers that want more than basic "press button = faster car."
 
-This system creates:
+Use it for progression-based upgrades, illegal tuner roleplay, mechanic interaction and street racing economies.
 
-Progression-based vehicle upgrades
-Illegal tuner / black market roleplay opportunities
-Realistic mechanic interactions
-Server economy expansion without heavy scripts
-💀 WHY THIS SCRIPT?
-Most tuner systems feel outdated or bloated.
-Reality Sucks Tuner Chip keeps it clean, fast, and immersive — built for modern QB-Core servers that actually care about performance AND RP depth.
+## 📦 Installation
 
-📦 INSTALLATION
+1. Download and place the resource in your resources folder.
+2. Add it to `server.cfg`.
+3. Ensure dependencies are running.
+4. Add the tuner item to your inventory system.
+5. Restart the server.
 
-Download & drag into your resources folder
-Add to server.cfg
-Ensure dependencies are running
-Add tuner item to your inventory system
-Restart & enjoy
-⚡ PERFECT FOR
-• Street Racing Servers
-• Underground Mechanic RP
-• Illegal Chop Shop Systems
-• Serious QB-Core Economies
+## ⚡ Great For
 
-💬 SUPPORT
-Drop a ⭐ on GitHub if you enjoy the resource and want more free releases from Reality Sucks RP.
+- Street racing servers
+- Underground mechanic RP
+- Illegal tuner / chop-shop gameplay
+- Custom vehicle economies
 
----
+## 💬 Support
 
-## Support This Project
+Drop a ⭐ on GitHub if you enjoy the resource and want more free releases from RealitySucksRP.
 
-<a href='https://ko-fi.com/R6R51XYJ6N' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+**More RealitySucksRP resources:** https://reality-sucks-rp-webstore.tebex.io/
