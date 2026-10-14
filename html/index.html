@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RS Drift Controller</title>
+    <link rel="stylesheet" href="app.css?v=310">
+</head>
+<body>
+    <main id="app" class="app" aria-hidden="true">
+        <section class="controller" role="dialog" aria-modal="true" aria-labelledby="controller-title">
+            <aside class="hero">
+                <div class="hero-shade"></div>
+                <div class="brand">
+                    <span class="eyebrow">REALITY SUCKS PERFORMANCE</span>
+                    <h1><span>RS</span> DRIFT LAB</h1>
+                    <p>Vehicle-bound ECU control</p>
+                </div>
+
+                <div class="vehicle-card">
+                    <div>
+                        <span class="micro">CURRENT VEHICLE</span>
+                        <strong id="vehicle-plate">NO PLATE</strong>
+                    </div>
+                    <span id="persistence-badge" class="badge">SESSION</span>
+                </div>
+
+                <div class="active-panel">
+                    <div class="active-copy">
+                        <span class="micro">DRIFT SYSTEM</span>
+                        <strong id="active-profile">BALANCED STREET</strong>
+                        <span id="active-state" class="state-text">STANDBY</span>
+                    </div>
+                    <button id="toggle-button" class="power-button" type="button" aria-label="Toggle drift mode">
+                        <span class="power-glyph"></span>
+                    </button>
+                </div>
+
+                <div class="hero-footer">
+                    <span><kbd>F5</kbd> ON-ROAD TOGGLE</span>
+                    <span class="live-dot"></span>
+                    <span>SERVER VERIFIED</span>
+                </div>
+            </aside>
+
+            <section class="workspace">
+                <header class="workspace-header">
+                    <div>
+                        <span class="eyebrow">TUNE LIBRARY</span>
+                        <h2 id="controller-title">Choose your line.</h2>
+                        <p>Stock-relative profiles tuned for progressive breakaway and clean recovery.</p>
+                    </div>
+                    <button id="close-button" class="close-button" type="button" aria-label="Close controller">×</button>
+                </header>
+
+                <div id="profile-grid" class="profile-grid" aria-live="polite"></div>
+
+                <footer class="workspace-footer">
+                    <div class="tip">
+                        <span class="tip-icon">!</span>
+                        <span>Profile changes require a driver seat and speed below 25 km/h.</span>
+                    </div>
+                    <div class="key-help"><kbd>ESC</kbd> CLOSE</div>
+                </footer>
+            </section>
+        </section>
+    </main>
+    <script src="app.js?v=310"></script>
+</body>
+</html>

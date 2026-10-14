@@ -1,0 +1,143 @@
+-- rs-tunerchip client provider.
+-- QBCore-shaped facade over rs_bridge so the drift code stays framework
+-- neutral and runs on Qbox, QBCore and ESX.
+
+RSTCBridge = RSTCBridge or {}
+
+local function bridgeUp()
+    return GetResourceState('rs_bridge') == 'started'
+end
+
+function RSTCBridge.Framework()
+    if not bridgeUp() then return nil end
+    local ok, framework = pcall(function() return exports.rs_bridge:GetFramework() end)
+    if ok and framework and framework ~= 'standalone' then return framework end
+    return nil
+end
+
+RSTCBridge.Core = {
+    Functions = {
+        Notify = function(message, notifyType, duration)
+            if not bridgeUp() then
+                print(('[rs-tunerchip] %s'):format(tostring(message)))
+                return false
+            end
+            return exports.rs_bridge:Notify(message, notifyType, duration)
+        end,
+        GetPlayerData = function()
+            if not bridgeUp() then return {} end
+            local ok, data = pcall(function() return exports.rs_bridge:GetPlayerData() end)
+            return ok and data or {}
+        end
+    }
+}
+
+-- Custom NUI focus is coordinated with rs_bridge's shared UI guard. Setting
+-- rsUiOpen blocks other RS key mappings while the drift controller owns input,
+-- and closing always releases both focus modes.
+local tunerUiOpen = false
+
+local function setSharedUiState(open)
+    local state = LocalPlayer and LocalPlayer.state
+    if state then state:set('rsUiOpen', open == true, false) end
+end
+
+function RSTCBridge.OpenTunerUi(payload)
+    if type(payload) ~= 'table' then return false end
+
+    tunerUiOpen = true
+    setSharedUiState(true)
+    SetNuiFocus(true, true)
+    if SetNuiFocusKeepInput then SetNuiFocusKeepInput(false) end
+    SendNUIMessage({ action = 'open', payload = payload })
+    return true
+end
+
+function RSTCBridge.UpdateTunerUi(payload)
+    if not tunerUiOpen or type(payload) ~= 'table' then return false end
+    SendNUIMessage({ action = 'update', payload = payload })
+    return true
+end
+
+function RSTCBridge.CloseTunerUi()
+    tunerUiOpen = false
+    setSharedUiState(false)
+    SetNuiFocus(false, false)
+    if SetNuiFocusKeepInput then SetNuiFocusKeepInput(false) end
+    SendNUIMessage({ action = 'close' })
+    return true
+end
+
+function RSTCBridge.IsTunerUiOpen()
+    return tunerUiOpen
+end
+
+-- A NUI page is created as soon as the resource starts, before any vehicle or
+-- menu state exists. Explicitly clear focus and hide the page so a cached CEF
+-- document or interrupted resource restart can never leave a full-screen
+-- surface over gameplay.
+CreateThread(function()
+    Wait(0)
+    RSTCBridge.CloseTunerUi()
+end)
+
+-- Menu abstraction.
+--
+-- ox_lib is the framework-neutral fallback menu provider. qb-menu remains an
+-- optional secondary fallback for QBCore servers that already use it.
+--
+-- items: { { title, description, onSelect = function() end }, ... }
+function RSTCBridge.OpenMenu(title, items)
+    if lib and lib.registerContext and lib.showContext then
+        local options = {}
+        for i = 1, #items do
+            local item = items[i]
+            options[i] = {
+                title = item.title,
+                description = item.description,
+                icon = item.icon,
+                onSelect = item.onSelect
+            }
+        end
+
+        local ok, err = pcall(function()
+            lib.registerContext({
+                id = 'rs_tunerchip_menu',
+                title = title,
+                options = options
+            })
+            lib.showContext('rs_tunerchip_menu')
+        end)
+        if ok then return true end
+        print(('[rs-tunerchip] ox_lib menu failed: %s'):format(tostring(err)))
+    end
+
+    if GetResourceState('qb-menu') == 'started' then
+        local header = { { header = title, isMenuHeader = true } }
+        for i = 1, #items do
+            local item = items[i]
+            header[#header + 1] = {
+                header = item.title,
+                txt = item.description,
+                params = {
+                    event = 'rs-tunerchip:client:menuSelect',
+                    args = { index = i }
+                }
+            }
+        end
+        RSTCBridge._menuItems = items
+        TriggerEvent('qb-menu:client:openMenu', header)
+        return true
+    end
+
+    RSTCBridge.Core.Functions.Notify('No menu system found (ox_lib or qb-menu required).', 'error')
+    return false
+end
+
+-- qb-menu cannot carry closures through params, so route its selection back
+-- to the stored item list.
+RegisterNetEvent('rs-tunerchip:client:menuSelect', function(data)
+    local items = RSTCBridge._menuItems
+    local item = items and data and items[data.index]
+    if item and item.onSelect then item.onSelect() end
+end)
