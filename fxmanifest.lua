@@ -2,13 +2,18 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'RealitySucks-TunerChip'
-author 'William'
-description 'Universal drift chip with multiple profiles (Balanced / Takeover / Pursuit / JDM / Muscle) using handling multipliers.'
-version '2.0.0'
+name 'rs-tunerchip'
+author 'Reality Sucks RP'
+description 'Server-authoritative vehicle-bound drift controller with stock-relative handling profiles.'
+version '3.1.2'
+
+shared_scripts {
+    '@ox_lib/init.lua',
+    'config.lua'
+}
 
 client_scripts {
-    'config.lua',
+    'bridge/client.lua',
     'client.lua'
 }
 
@@ -16,4 +21,17 @@ server_scripts {
     'server.lua'
 }
 
-dependency 'qb-core'
+ui_page 'html/index.html'
+
+files {
+    'html/index.html',
+    'html/app.css',
+    'html/app.js',
+    'html/assets/*'
+}
+
+-- UI helpers resolve through ox_lib.
+-- Framework integrations are handled internally at runtime.
+dependencies {
+    'ox_lib'
+}

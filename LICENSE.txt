@@ -1,0 +1,12 @@
+RS Tuner Chip - Full Source Commercial License
+Copyright (c) 2026 Reality Sucks RP. All rights reserved in the original RS source code and original RS-owned assets.
+
+A valid purchaser may install, run, and modify this resource for servers they own or operate. Source access is provided for configuration, maintenance, and server-specific modification.
+
+You may not redistribute, resell, sublicense, share, leak, publish, or otherwise provide the licensed RS source code or RS-owned assets to third parties, whether modified or unmodified, except to staff or contractors who require access solely to operate your licensed server and who are bound to keep the files private.
+
+You may not upload this resource or substantial portions of it to a public repository or include it in another product offered for redistribution or sale.
+
+Third-party dependencies or third-party material, if any, remain subject to their own licenses and terms and are not relicensed by this file.
+
+This software is provided as-is, without warranty, to the maximum extent permitted by applicable law.
