@@ -1,38 +1,50 @@
--- rs-tunerchip client provider.
--- QBCore-shaped facade over rs_bridge so the drift code stays framework
--- neutral and runs on Qbox, QBCore and ESX.
+-- Local client provider for Qbox, QBCore, ESX and standalone.
+-- UI ownership and shared key-mapping state remain local to this resource.
 
 RSTCBridge = RSTCBridge or {}
 
-local function bridgeUp()
-    return GetResourceState('rs_bridge') == 'started'
-end
-
 function RSTCBridge.Framework()
-    if not bridgeUp() then return nil end
-    local ok, framework = pcall(function() return exports.rs_bridge:GetFramework() end)
-    if ok and framework and framework ~= 'standalone' then return framework end
-    return nil
+    if GetResourceState('qbx_core') == 'started' then return 'qbox' end
+    if GetResourceState('qb-core') == 'started' then return 'qbcore' end
+    if GetResourceState('es_extended') == 'started' then return 'esx' end
+    return 'standalone'
 end
 
 RSTCBridge.Core = {
     Functions = {
         Notify = function(message, notifyType, duration)
-            if not bridgeUp() then
-                print(('[rs-tunerchip] %s'):format(tostring(message)))
-                return false
+            if lib and lib.notify then
+                local ok = pcall(lib.notify, {
+                    title = 'RS Tuner Chip',
+                    description = tostring(message),
+                    type = notifyType or 'inform',
+                    duration = duration
+                })
+                if ok then return true end
             end
-            return exports.rs_bridge:Notify(message, notifyType, duration)
+            print(('[rs-tunerchip] %s'):format(tostring(message)))
+            return false
         end,
         GetPlayerData = function()
-            if not bridgeUp() then return {} end
-            local ok, data = pcall(function() return exports.rs_bridge:GetPlayerData() end)
-            return ok and data or {}
+            local provider = RSTCBridge.Framework()
+            local ok, data
+            if provider == 'qbox' then
+                ok, data = pcall(function() return exports.qbx_core:GetPlayerData() end)
+            elseif provider == 'qbcore' then
+                ok, data = pcall(function()
+                    return exports['qb-core']:GetCoreObject().Functions.GetPlayerData()
+                end)
+            elseif provider == 'esx' then
+                ok, data = pcall(function()
+                    return exports['es_extended']:getSharedObject().GetPlayerData()
+                end)
+            end
+            return ok and type(data) == 'table' and data or {}
         end
     }
 }
 
--- Custom NUI focus is coordinated with rs_bridge's shared UI guard. Setting
+-- NUI focus is coordinated through local player state. Setting
 -- rsUiOpen blocks other RS key mappings while the drift controller owns input,
 -- and closing always releases both focus modes.
 local tunerUiOpen = false
