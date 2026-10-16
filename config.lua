@@ -1,8 +1,8 @@
 Config = Config or {}
 
--- One chip is installed on one vehicle. Owned vehicles use a stable vehicle ID
--- when the active framework exposes one through rs_bridge. Other vehicles keep
--- their chip for the lifetime of that network entity only.
+-- One chip is installed on one vehicle. Qbox-owned vehicles use stable IDs
+-- from qbx_vehicles. Other vehicles keep their chip for the lifetime of that
+-- network entity unless safe, unique-plate persistence is explicitly enabled.
 Config.DefaultProfile           = 'Balanced'
 Config.PersistentPlateFallback = false -- only enable if plates are guaranteed unique
 Config.StateBagKey              = 'rsTunerchip'

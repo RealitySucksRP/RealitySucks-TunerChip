@@ -694,11 +694,15 @@ CreateThread(function()
     end
 end)
 
-AddEventHandler('rs_bridge:client:playerUnloaded', function()
+local function handlePlayerUnloaded()
     RSTCBridge.CloseTunerUi()
     local vehicle = getDriverVehicle()
     if vehicle then disableDrift(vehicle, true) end
-end)
+end
+
+AddEventHandler('QBCore:Client:OnPlayerUnload', handlePlayerUnloaded)
+AddEventHandler('qbx_core:client:playerLoggedOut', handlePlayerUnloaded)
+AddEventHandler('esx:onPlayerLogout', handlePlayerUnloaded)
 
 AddEventHandler('onClientResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end

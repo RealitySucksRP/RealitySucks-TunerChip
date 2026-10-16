@@ -17,32 +17,30 @@ Install a tuner chip, pick a profile and send it sideways. Eight drift profiles 
 
 </details>
 
-## Package documentation
-
-# RS Tuner Chip
-
-The supplied ZIP still calls the external `rs_bridge` exports for inventory-based installation. Follow the dependency/start-order instructions below for this package. 
-
-Vehicle-bound drift controller for FiveM with server-authoritative install, removal, profile selection, and enable/disable state.
-
 ## Requirements
 
+- An up-to-date FiveM server with OneSync enabled
+- `ox_lib` for notifications and the interface helpers
+- For inventory-based installation: Qbox, QBCore, or ESX with a compatible inventory (`ox_inventory`, `qb-inventory`, or the framework's own inventory)
+- Register `tunerchip` and `tunerchip_remover` as inventory items
 
-- `ox_lib`
-- OneSync-enabled FiveM server
-- A framework/inventory combination supported by your `rs_bridge` configuration for item-based installs
-
-The resource is designed for Qbox, QBCore, and ESX through `rs_bridge`. Qbox and frameworks where `rs_bridge` can resolve a stable owned-vehicle ID receive persistent vehicle-bound installs. Other vehicles use session-only entity state unless `Config.PersistentPlateFallback` is deliberately enabled.
+No additional cross-resource adapter is required. Item registration uses the active framework directly; inventory presence and item removal are rechecked on the server.
 
 ## Install
 
-1. Place the folder in your resources directory as `rs-tunerchip`.
-2. Ensure `ox_lib` and `rs_bridge` start before this resource.
-3. Add the configured items to your inventory system:
-   - `tunerchip`
-   - `tunerchip_remover`
-4. Add `ensure rs-tunerchip` after the dependencies in `server.cfg`.
-5. Review `config.lua` before going live.
+1. Place the resource folder at `resources/rs-tunerchip`.
+2. Ensure your framework and inventory system start first, followed by `ox_lib` and `rs-tunerchip`.
+3. Register the `tunerchip` and `tunerchip_remover` items with your inventory.
+4. Review `config.lua` before going live.
+
+```cfg
+ensure ox_lib
+ensure rs-tunerchip
+```
+
+For `ox_inventory`, use `consume = 0` so the resource can validate the driver, vehicle and item again at the end of its progress action. You can configure both items with `server = { export = 'rs-tunerchip.useTunerChip' }` for direct ox_inventory item callbacks. For Qbox, QBCore or ESX, usable items are also registered through their native framework API. Do not configure two separate activation paths for the same item.
+
+**Vehicle persistence:** Qbox-owned vehicles use their stable `qbx_vehicles` ID and retain previously saved tuner-chip state. Without an owned-vehicle ID, the installation lasts for that network entity only. Set `Config.PersistentPlateFallback = true` only if plates on your server are guaranteed unique.
 
 ## Controls
 
@@ -74,6 +72,3 @@ Only explicitly allowlisted server resources can use the customs installation fl
 - Install/remove actions are revalidated server-side at completion.
 - Profile changes require the player to be the live driver and below the configured speed limit.
 - No webhook, remote code loader, external license token, or external account is required by this resource.
-
-
-[Earlier repository documentation and all existing links](PREVIOUS_README.md)
