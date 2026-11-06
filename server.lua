@@ -76,14 +76,13 @@ local function resolveIdentity(vehicle, netId)
         plate = cleanPlate(GetVehicleNumberPlateText(vehicle))
     end)
 
-    -- Qbox provides a stable vehicle ID for owned vehicles. Keep the original
-    -- v3 key format so previously installed chips continue to load.
-    if GetResourceState('qbx_core') == 'started' and plate ~= '' then
+    if GetResourceState('qbx_vehicles') == 'started' then
         local vehicleId
         pcall(function()
             vehicleId = Entity(vehicle).state.vehicleid
         end)
-        if not tonumber(vehicleId) and GetResourceState('qbx_vehicles') == 'started' then
+
+        if not vehicleId and plate ~= '' then
             pcall(function()
                 vehicleId = exports.qbx_vehicles:GetVehicleIdByPlate(plate)
             end)
@@ -297,91 +296,12 @@ local function mutationAllowed(src)
     return true
 end
 
--- Inventory operations are server-side and fail closed when no compatible
--- provider is running. Never trust the player's item-use event as proof of
--- possession: the item is checked again immediately before saving a chip.
-local function qbPlayer(src)
-    if GetResourceState('qb-core') ~= 'started' then return nil end
-    local ok, player = pcall(function()
-        local core = exports['qb-core']:GetCoreObject()
-        return core.Functions.GetPlayer(src)
-    end)
-    return ok and player or nil
-end
-
-local function esxPlayer(src)
-    if GetResourceState('es_extended') ~= 'started' then return nil end
-    local ok, player = pcall(function()
-        return exports['es_extended']:getSharedObject().GetPlayerFromId(src)
-    end)
-    return ok and player or nil
-end
-
 local function hasItem(src, itemName)
-    if GetResourceState('ox_inventory') == 'started' then
-        local ok, count = pcall(function()
-            return exports.ox_inventory:Search(src, 'count', itemName)
-        end)
-        return ok and (tonumber(count) or 0) >= 1
-    end
-
-    if GetResourceState('qb-inventory') == 'started' then
-        local ok, found = pcall(function()
-            return exports['qb-inventory']:HasItem(src, itemName, 1)
-        end)
-        if ok then return found == true end
-    end
-
-    local player = qbPlayer(src)
-    if player and player.Functions and player.Functions.GetItemByName then
-        local ok, item = pcall(player.Functions.GetItemByName, itemName)
-        return ok and item ~= nil and (tonumber(item.amount) or 0) >= 1
-    end
-
-    player = esxPlayer(src)
-    if player and player.getInventoryItem then
-        local ok, item = pcall(function() return player.getInventoryItem(itemName) end)
-        return ok and item ~= nil and (tonumber(item.count) or 0) >= 1
-    end
-
-    return false
+    return RSTCBridge and RSTCBridge.HasItem and RSTCBridge.HasItem(src, itemName, 1) == true
 end
 
 local function removeItem(src, itemName, slot)
-    if GetResourceState('ox_inventory') == 'started' then
-        local ok, removed = pcall(function()
-            return exports.ox_inventory:RemoveItem(src, itemName, 1, nil, slot)
-        end)
-        return ok and removed == true
-    end
-
-    if GetResourceState('qb-inventory') == 'started' then
-        local ok, removed = pcall(function()
-            return exports['qb-inventory']:RemoveItem(src, itemName, 1, slot, 'rs-tunerchip')
-        end)
-        if ok then return removed == true end
-    end
-
-    local player = qbPlayer(src)
-    if player and player.Functions and player.Functions.RemoveItem then
-        local ok, removed = pcall(player.Functions.RemoveItem, itemName, 1, slot)
-        return ok and removed == true
-    end
-
-    player = esxPlayer(src)
-    if player and player.getInventoryItem and player.removeInventoryItem then
-        local ok, removed = pcall(function()
-            local before = player.getInventoryItem(itemName)
-            local count = before and tonumber(before.count) or 0
-            if count < 1 then return false end
-            player.removeInventoryItem(itemName, 1)
-            local after = player.getInventoryItem(itemName)
-            return after and (tonumber(after.count) or count) < count
-        end)
-        return ok and removed == true
-    end
-
-    return false
+    return RSTCBridge and RSTCBridge.RemoveItem and RSTCBridge.RemoveItem(src, itemName, 1, slot) == true
 end
 
 local function beginItemAction(src, kind, itemName, itemData)
@@ -430,78 +350,56 @@ local function beginItemAction(src, kind, itemName, itemData)
     )
 end
 
--- Native usable-item registrations for Qbox, QBCore and ESX. For a direct
--- ox_inventory server.export integration, the same handler is exposed below.
 local registeredItems = {}
-
-local function itemKind(itemName)
-    for _, name in ipairs(Config.UseableItems or { 'tunerchip' }) do
-        if name == itemName then return 'install' end
-    end
-    for _, name in ipairs(Config.RemoverItems or { 'tunerchip_remover' }) do
-        if name == itemName then return 'remove' end
-    end
-end
-
 local function registerUseableItem(itemName, kind)
-    if type(itemName) ~= 'string' or itemName == '' then return end
+    itemName = type(itemName) == 'string' and itemName or nil
+    if not itemName or itemName == '' or registeredItems[itemName] then return true end
 
-    local provider
-    if GetResourceState('qbx_core') == 'started' then
-        provider = 'qbx_core'
-    elseif GetResourceState('qb-core') == 'started' then
-        provider = 'qb-core'
-    elseif GetResourceState('es_extended') == 'started' then
-        provider = 'es_extended'
-    end
-    if not provider or registeredItems[itemName] == provider then return end
-
-    local callback = function(src, itemData)
-        beginItemAction(tonumber(src), kind, itemName, itemData)
-    end
-
-    local ok, err = pcall(function()
-        if provider == 'qbx_core' then
-            exports.qbx_core:CreateUseableItem(itemName, callback)
-        elseif provider == 'qb-core' then
-            exports['qb-core']:GetCoreObject().Functions.CreateUseableItem(itemName, callback)
-        else
-            exports['es_extended']:getSharedObject().RegisterUsableItem(itemName, callback)
-        end
+    local ok, reason = RSTCBridge.CreateUseableItem(itemName, function(source, itemData)
+        beginItemAction(tonumber(source), kind, itemName, itemData)
     end)
+
     if ok then
-        registeredItems[itemName] = provider
-    else
-        print(('[rs-tunerchip] Item %s registration failed for %s: %s'):format(itemName, provider, tostring(err)))
+        registeredItems[itemName] = true
+        return true
     end
+
+    return false, reason
 end
 
-local function registerAllItems()
-    for _, itemName in ipairs(Config.UseableItems or { 'tunerchip' }) do
-        registerUseableItem(itemName, 'install')
-    end
-    for _, itemName in ipairs(Config.RemoverItems or { 'tunerchip_remover' }) do
-        registerUseableItem(itemName, 'remove')
-    end
-end
+CreateThread(function()
+    local deadline = GetGameTimer() + 15000
 
-registerAllItems()
+    while true do
+        local allRegistered = true
+        local lastReason
 
--- ox_inventory alternative: set server.export = 'rs-tunerchip.useTunerChip'
--- and consume = 0 for each item in ox_inventory/data/items.lua. The tuner
--- resource controls consumption only after its own timed server revalidation.
-exports('useTunerChip', function(event, item, inventory, slot)
-    if event ~= 'usedItem' or type(item) ~= 'table' then return end
-    local kind = itemKind(item.name)
-    local src = type(inventory) == 'table' and tonumber(inventory.id) or tonumber(inventory)
-    if not kind or not src or src <= 0 or GetPlayerPing(src) <= 0 then return end
-    beginItemAction(src, kind, item.name, { slot = slot })
-end)
+        for _, itemName in ipairs(Config.UseableItems or { 'tunerchip' }) do
+            local ok, reason = registerUseableItem(itemName, 'install')
+            if not ok then allRegistered = false; lastReason = reason end
+        end
 
-AddEventHandler('onResourceStart', function(resource)
-    if resource == 'qbx_core' or resource == 'qb-core' or resource == 'es_extended' then
-        for name in pairs(registeredItems) do registeredItems[name] = nil end
-        SetTimeout(500, registerAllItems)
+        for _, itemName in ipairs(Config.RemoverItems or { 'tunerchip_remover' }) do
+            local ok, reason = registerUseableItem(itemName, 'remove')
+            if not ok then allRegistered = false; lastReason = reason end
+        end
+
+        if allRegistered then
+            print(('[rs-tunerchip] usable items registered | framework=%s | inventory=%s')
+                :format(
+                    tostring(RSTCBridge.Framework()),
+                    GetResourceState('ox_inventory') == 'started' and 'ox_inventory' or 'framework'
+                ))
+            return
+        end
+
+        if GetGameTimer() >= deadline then
+            print(('[rs-tunerchip] WARNING: usable-item registration failed: %s')
+                :format(tostring(lastReason or 'framework not ready')))
+            return
+        end
+
+        Wait(500)
     end
 end)
 

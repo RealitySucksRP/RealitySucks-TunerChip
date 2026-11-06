@@ -1,8 +1,9 @@
 Config = Config or {}
 
--- One chip is installed on one vehicle. Qbox-owned vehicles use stable IDs
--- from qbx_vehicles. Other vehicles keep their chip for the lifetime of that
--- network entity unless safe, unique-plate persistence is explicitly enabled.
+-- One chip is installed on one vehicle. On Qbox, player-owned vehicles are
+-- persisted by qbx_vehicles vehicle id. Other vehicles keep their chip for the
+-- lifetime of that network entity only, avoiding random plate reuse making a
+-- future vehicle look pre-installed.
 Config.DefaultProfile           = 'Balanced'
 Config.PersistentPlateFallback = false -- only enable if plates are guaranteed unique
 Config.StateBagKey              = 'rsTunerchip'
@@ -31,7 +32,8 @@ Config.ActionCooldownMs = 350
 Config.MaxInstallSpeedKph   = 5.0
 Config.MaxConfigureSpeedKph = 25.0
 
--- Smooth handling transition duration. Set to 0 for instant changes.
+-- Longer than the old 600 ms step change, but still quick enough to catch a
+-- slide. Set to 0 for instant handling changes.
 Config.TransitionMs = 850
 Config.ReassertHandlingMs = 1500
 
@@ -216,7 +218,7 @@ Config.Modes = {
 
     Takeover = {
         label = 'Takeover Angle',
-        desc = 'Easy initiation and big angle with controlled breakaway and recovery.',
+        desc = 'Easy initiation and big angle, tuned to avoid the old snap/spin behavior.',
         mult = {
             fTractionCurveMin               = 0.82,
             fTractionCurveMax               = 0.86,
@@ -324,7 +326,7 @@ Config.Modes = {
             fCamberStiffnesss = { 0.0, 0.09 },
         },
         power = 20.0,
-        torque = 1.12,
+        torque = 2.12,
         driftTyres = true,
         reduceGrip = false,
     },

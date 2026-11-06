@@ -694,15 +694,15 @@ CreateThread(function()
     end
 end)
 
-local function handlePlayerUnloaded()
+local function onPlayerUnload()
     RSTCBridge.CloseTunerUi()
     local vehicle = getDriverVehicle()
     if vehicle then disableDrift(vehicle, true) end
 end
 
-AddEventHandler('QBCore:Client:OnPlayerUnload', handlePlayerUnloaded)
-AddEventHandler('qbx_core:client:playerLoggedOut', handlePlayerUnloaded)
-AddEventHandler('esx:onPlayerLogout', handlePlayerUnloaded)
+AddEventHandler('QBCore:Client:OnPlayerUnload', onPlayerUnload)
+AddEventHandler('qbx_core:client:playerLoggedOut', onPlayerUnload)
+AddEventHandler('esx:onPlayerLogout', onPlayerUnload)
 
 AddEventHandler('onClientResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
@@ -772,4 +772,9 @@ RegisterCommand(Config.StatusCommand or 'driftstatus', function()
         store.torque or 1.0
     )
     notify(summary, 'success', 6000)
+    print(('[rs-tunerchip] %s | persistent=%s | plate=%s'):format(
+        summary,
+        tostring(CurrentVehicleState.persistent),
+        tostring(CurrentVehicleState.plate)
+    ))
 end, false)

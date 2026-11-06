@@ -130,3 +130,29 @@ window.addEventListener('message', (event) => {
     app.classList.add('visible');
     app.setAttribute('aria-hidden', 'false');
 });
+
+// Localhost-only fixture for visual QA. FiveM's NUI origin never matches this
+// branch, so live state still comes exclusively from the Lua bridge.
+if ((location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+    && new URLSearchParams(location.search).get('preview') === '1') {
+    window.postMessage({
+        action: 'open',
+        payload: {
+            installed: true,
+            enabled: true,
+            profile: 'Balanced',
+            persistent: true,
+            plate: 'RS DRIFT',
+            profiles: [
+                { name: 'Balanced', label: 'Balanced Street', description: 'Progressive breakaway, stable transitions, easy recovery.', power: 10, torque: 1.07, image: 'assets/mode-balanced.jpg', accent: '#ff9a3d', tag: 'SMOOTH' },
+                { name: 'Arcade', label: 'Arcade GTA Native', description: 'Native drift tires blended with Balanced, JDM, Muscle, and Takeover control.', power: 15, torque: 1.11, image: 'assets/mode-arcade.jpg', accent: '#ffd45e', tag: 'FUSION' },
+                { name: 'JDM', label: 'JDM Technical', description: 'Sharper response and more angle without abrupt rear-grip loss.', power: 14, torque: 1.10, image: 'assets/mode-jdm.jpg', accent: '#55c7ff', tag: 'TECHNICAL' },
+                { name: 'Muscle', label: 'Muscle Torque', description: 'Longer power-over slides with controlled torque.', power: 18, torque: 1.13, image: 'assets/mode-muscle.jpg', accent: '#c86bff', tag: 'TORQUE' },
+                { name: 'Takeover', label: 'Takeover Angle', description: 'Easy initiation and big, recoverable angle.', power: 16, torque: 1.12, image: 'assets/mode-takeover.jpg', accent: '#ff49cf', tag: 'ANGLE' },
+                { name: 'Pursuit', label: 'Pursuit Hybrid', description: 'Near-stock grip with extra rotation for city driving.', power: 12, torque: 1.08, image: 'assets/mode-pursuit.jpg', accent: '#ffc83d', tag: 'HYBRID' },
+                { name: 'OEM', label: 'Rockstar Native', description: 'Rockstar native drift tires with mild steering and powertrain support.', power: 12, torque: 1.08, image: 'assets/mode-oem.jpg', accent: '#7ef0ff', tag: 'NATIVE' },
+                { name: 'NativeX', label: 'Native X', description: 'GTA V native drift tires plus a unique low-speed angle-assist tune.', power: 16, torque: 1.12, image: 'assets/mode-nativex.jpg', accent: '#8bf160', tag: 'NATIVE+' },
+            ],
+        },
+    }, '*');
+}

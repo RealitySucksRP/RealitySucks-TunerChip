@@ -1,52 +1,63 @@
--- Local client provider for Qbox, QBCore, ESX and standalone.
--- UI ownership and shared key-mapping state remain local to this resource.
+-- =============================================================================
+-- RS TUNER CHIP CLIENT ADAPTER -- local framework helpers
+-- =============================================================================
+-- Uses the included RSFramework adapter for framework detection,
+-- notifications, and player data.
+-- =============================================================================
 
 RSTCBridge = RSTCBridge or {}
 
+local function core()
+    if not RSFramework or not RSFramework.GetCore then return nil end
+    local ok, value = pcall(RSFramework.GetCore)
+    return ok and value or nil
+end
+
 function RSTCBridge.Framework()
-    if GetResourceState('qbx_core') == 'started' then return 'qbox' end
-    if GetResourceState('qb-core') == 'started' then return 'qbcore' end
-    if GetResourceState('es_extended') == 'started' then return 'esx' end
-    return 'standalone'
+    if not RSFramework or not RSFramework.Detect then return 'standalone' end
+    local ok, framework = pcall(RSFramework.Detect)
+    return ok and framework or 'standalone'
 end
 
 RSTCBridge.Core = {
     Functions = {
         Notify = function(message, notifyType, duration)
+            local c = core()
+            if c and c.Functions and c.Functions.Notify then
+                local ok = pcall(c.Functions.Notify, message, notifyType, duration)
+                if ok then return true end
+            end
+
             if lib and lib.notify then
                 local ok = pcall(lib.notify, {
-                    title = 'RS Tuner Chip',
-                    description = tostring(message),
+                    description = tostring(message or ''),
                     type = notifyType or 'inform',
-                    duration = duration
+                    duration = tonumber(duration) or 5000,
                 })
                 if ok then return true end
             end
-            print(('[rs-tunerchip] %s'):format(tostring(message)))
+
+            if message then
+                BeginTextCommandThefeedPost('STRING')
+                AddTextComponentSubstringPlayerName(tostring(message))
+                EndTextCommandThefeedPostTicker(false, false)
+                return true
+            end
             return false
         end,
         GetPlayerData = function()
-            local provider = RSTCBridge.Framework()
-            local ok, data
-            if provider == 'qbox' then
-                ok, data = pcall(function() return exports.qbx_core:GetPlayerData() end)
-            elseif provider == 'qbcore' then
-                ok, data = pcall(function()
-                    return exports['qb-core']:GetCoreObject().Functions.GetPlayerData()
-                end)
-            elseif provider == 'esx' then
-                ok, data = pcall(function()
-                    return exports['es_extended']:getSharedObject().GetPlayerData()
-                end)
+            local c = core()
+            if c and c.Functions and c.Functions.GetPlayerData then
+                local ok, data = pcall(c.Functions.GetPlayerData)
+                if ok and type(data) == 'table' then return data end
             end
-            return ok and type(data) == 'table' and data or {}
+            return {}
         end
     }
 }
 
--- NUI focus is coordinated through local player state. Setting
--- rsUiOpen blocks other RS key mappings while the drift controller owns input,
--- and closing always releases both focus modes.
+-- Custom NUI focus coordination. Setting rsUiOpen blocks other RS key mappings
+-- while the drift controller owns input, and closing always releases focus.
 local tunerUiOpen = false
 
 local function setSharedUiState(open)
@@ -84,21 +95,13 @@ function RSTCBridge.IsTunerUiOpen()
     return tunerUiOpen
 end
 
--- A NUI page is created as soon as the resource starts, before any vehicle or
--- menu state exists. Explicitly clear focus and hide the page so a cached CEF
--- document or interrupted resource restart can never leave a full-screen
--- surface over gameplay.
 CreateThread(function()
     Wait(0)
     RSTCBridge.CloseTunerUi()
 end)
 
--- Menu abstraction.
---
--- ox_lib is the framework-neutral fallback menu provider. qb-menu remains an
--- optional secondary fallback for QBCore servers that already use it.
---
--- items: { { title, description, onSelect = function() end }, ... }
+-- Menu abstraction. ox_lib is framework-neutral and preferred; qb-menu remains
+-- a fallback for QBCore servers that still use it.
 function RSTCBridge.OpenMenu(title, items)
     if lib and lib.registerContext and lib.showContext then
         local options = {}
@@ -146,8 +149,6 @@ function RSTCBridge.OpenMenu(title, items)
     return false
 end
 
--- qb-menu cannot carry closures through params, so route its selection back
--- to the stored item list.
 RegisterNetEvent('rs-tunerchip:client:menuSelect', function(data)
     local items = RSTCBridge._menuItems
     local item = items and data and items[data.index]

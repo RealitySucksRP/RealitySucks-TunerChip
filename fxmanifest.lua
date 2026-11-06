@@ -3,8 +3,8 @@ game 'gta5'
 lua54 'yes'
 
 name 'rs-tunerchip'
-author 'Reality Sucks RP'
-description 'Server-authoritative vehicle-bound drift controller with stock-relative handling profiles.'
+author 'William Brito - RealitySucksRP'
+description 'Server-authoritative per-vehicle drift chip with smooth stock-relative handling profiles.'
 version '3.1.2'
 
 shared_scripts {
@@ -13,11 +13,15 @@ shared_scripts {
 }
 
 client_scripts {
+    'bridge/rs_uiguard.lua',
+    'bridge/rs_framework.lua',
     'bridge/client.lua',
     'client.lua'
 }
 
 server_scripts {
+    'bridge/rs_framework.lua',
+    'bridge/server.lua',
     'server.lua'
 }
 
@@ -30,8 +34,7 @@ files {
     'html/assets/*'
 }
 
--- UI helpers resolve through ox_lib.
--- Framework integrations are handled internally at runtime.
+-- Framework and menu helpers are bundled locally and use ox_lib.
 dependencies {
     'ox_lib'
 }
